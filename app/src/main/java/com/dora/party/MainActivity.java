@@ -21,7 +21,7 @@ import com.dora.party.domain.Donation;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +53,8 @@ public class MainActivity extends ActionBarActivity {
 
     private ArrayList<Map<String, String>> costData;
 
+    private GregorianCalendar calendar = new GregorianCalendar();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,11 +78,11 @@ public class MainActivity extends ActionBarActivity {
         BigDecimal allDonationValue = new BigDecimal(dataManager.getAllDonationValue());
         BigDecimal allCostValue = new BigDecimal(dataManager.getAllCostValue());
 
-        totalValueView.setText(allDonationValue.toPlainString());
+        totalValueView.setText(allDonationValue.toPlainString() + getString(R.string.unit));
 
         BigDecimal balanceValue = allDonationValue.subtract(allCostValue);
 
-        balanceValueView.setText(balanceValue.toPlainString());
+        balanceValueView.setText(balanceValue.toPlainString() + getString(R.string.unit));
     }
 
     @Override
@@ -101,12 +103,20 @@ public class MainActivity extends ActionBarActivity {
         if (id == R.id.action_clear) {
 
             dataManager.clearAllData();
+            clearMemoryCache();
+
             refreshListViews();
             refreshTotalValues();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void clearMemoryCache() {
+
+        donationData.clear();
+        costData.clear();
     }
 
     @OnClick(R.id.add_donation_button)
@@ -160,12 +170,20 @@ public class MainActivity extends ActionBarActivity {
         final EditText nameEditText = ButterKnife.findById(viewContent, R.id.name);
         final EditText valueEditText = ButterKnife.findById(viewContent, R.id.value);
 
+        dateCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+                calendar = new GregorianCalendar(year, month, dayOfMonth);
+            }
+        });
+
         alert.setView(viewContent);
         alert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                Cost cost = new Cost(new Date(dateCalendarView.getDate()), nameEditText.getText().toString(), Double.valueOf(valueEditText.getText().toString()));
+                Cost cost = new Cost(calendar, nameEditText.getText().toString(), Double.valueOf(valueEditText.getText().toString()));
                 addCost(cost);
                 dataManager.saveCost(cost);
                 refreshListViews();
@@ -181,16 +199,16 @@ public class MainActivity extends ActionBarActivity {
 
         HashMap<String, String> map = new HashMap<>();
         map.put("name", donation.getName());
-        map.put("value", String.valueOf(donation.getValue()));
+        map.put("value", String.valueOf(donation.getValue()) + getString(R.string.unit));
         donationData.add(map);
     }
 
     private void addCost(Cost cost) {
 
         HashMap<String, String> map = new HashMap<>();
-        map.put("date", cost.getFormatedDate());
+        map.put("date", cost.getFormattedDate());
         map.put("name", cost.getName());
-        map.put("value", String.valueOf(cost.getValue()));
+        map.put("value", String.valueOf(cost.getValue()) + getString(R.string.unit));
         costData.add(map);
     }
 

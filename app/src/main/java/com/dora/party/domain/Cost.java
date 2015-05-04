@@ -5,10 +5,11 @@ import com.orm.SugarRecord;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 public class Cost extends SugarRecord<Cost> implements Serializable {
 
-    private Date date;
+    private GregorianCalendar calendar;
 
     private String name;
 
@@ -19,8 +20,8 @@ public class Cost extends SugarRecord<Cost> implements Serializable {
 
     }
 
-    public Cost(Date date, String name, double value) {
-        this.date = date;
+    public Cost(GregorianCalendar calendar, String name, double value) {
+        this.calendar = calendar;
         this.name = name;
         this.value = value;
     }
@@ -41,15 +42,15 @@ public class Cost extends SugarRecord<Cost> implements Serializable {
         this.value = value;
     }
 
-    public Date getDate() {
-        return date;
+    public GregorianCalendar getCalendar() {
+        return calendar;
     }
 
-    public String getFormatedDate() {
-        return new SimpleDateFormat("dd/MM/yyyy").format(date);
+    public String getFormattedDate() {
+        return new SimpleDateFormat("yyyy/MM/dd").format(calendar.getTime());
     }
 
-    public void setDate(Date date) {
-        this.date = date;
+    public void setCalendar(GregorianCalendar calendar) {
+        this.calendar = calendar;
     }
 }
