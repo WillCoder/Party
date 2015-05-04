@@ -1,13 +1,16 @@
 package com.dora.party;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.CalendarView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -35,8 +38,6 @@ public class MainActivity extends ActionBarActivity {
 
     static final private String TAG = "MainActivity";
 
-    DataManager dataManager = null;
-
     @InjectView(R.id.donation_list)
     ListView donationList;
 
@@ -54,6 +55,8 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<Map<String, String>> costData;
 
     private GregorianCalendar calendar = new GregorianCalendar();
+
+    DataManager dataManager = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -144,7 +147,19 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         alert.setNegativeButton(R.string.cancel, null);
-        AlertDialog donationDialog = alert.create();
+        final AlertDialog donationDialog = alert.create();
+
+        valueEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    donationDialog.getButton(Dialog.BUTTON_POSITIVE).performClick();
+                }
+                return false;
+            }
+        });
+
         donationDialog.show();
     }
 
@@ -160,7 +175,7 @@ public class MainActivity extends ActionBarActivity {
     @OnClick(R.id.add_cost_button)
     public void onAddCostButtonClick(ImageView addCostButton) {
 
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(R.string.add_cost_dialog_title);
 
         LayoutInflater inflater = getLayoutInflater();
@@ -169,6 +184,7 @@ public class MainActivity extends ActionBarActivity {
         final CalendarView dateCalendarView = ButterKnife.findById(viewContent, R.id.date);
         final EditText nameEditText = ButterKnife.findById(viewContent, R.id.name);
         final EditText valueEditText = ButterKnife.findById(viewContent, R.id.value);
+
 
         dateCalendarView.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
@@ -191,7 +207,20 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         alert.setNegativeButton(R.string.cancel, null);
-        AlertDialog costDialog = alert.create();
+
+        final AlertDialog costDialog = alert.create();
+
+        valueEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+
+                    costDialog.getButton(Dialog.BUTTON_POSITIVE).performClick();
+                }
+                return false;
+            }
+        });
+
         costDialog.show();
     }
 
