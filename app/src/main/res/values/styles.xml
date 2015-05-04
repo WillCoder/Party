@@ -68,4 +68,12 @@
         <item name="android:padding">10dp</item>
         <item name="android:src">@android:drawable/ic_menu_add</item>
     </style>
+
+    <style name="AddTextViewStyle">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 </resources>

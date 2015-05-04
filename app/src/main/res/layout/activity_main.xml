@@ -25,9 +25,10 @@
             android:id="@+id/donation_section"
             android:orientation="horizontal">
 
-            <ImageButton
-                style="@style/AddButtonStyle"
+            <TextView
+                style="@style/AddTextViewStyle"
                 android:background="#0099cc"
+                android:text="@string/add_donation"
                 android:id="@+id/add_donation_button" />
 
             <TextView
@@ -69,8 +70,9 @@
             android:orientation="horizontal">
 
 
-            <ImageButton
-                style="@style/AddButtonStyle"
+            <TextView
+                style="@style/AddTextViewStyle"
+                android:text="@string/new_cost"
                 android:background="#ff8a00"
                 android:id="@+id/add_cost_button" />
 

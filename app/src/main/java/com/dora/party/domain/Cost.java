@@ -9,7 +9,7 @@ import java.util.GregorianCalendar;
 
 public class Cost extends SugarRecord<Cost> implements Serializable {
 
-    private GregorianCalendar calendar;
+    private Date date;
 
     private String name;
 
@@ -21,7 +21,7 @@ public class Cost extends SugarRecord<Cost> implements Serializable {
     }
 
     public Cost(GregorianCalendar calendar, String name, double value) {
-        this.calendar = calendar;
+        this.date = calendar.getTime();
         this.name = name;
         this.value = value;
     }
@@ -42,15 +42,15 @@ public class Cost extends SugarRecord<Cost> implements Serializable {
         this.value = value;
     }
 
-    public GregorianCalendar getCalendar() {
-        return calendar;
+    public Date getCalendar() {
+        return date;
     }
 
     public String getFormattedDate() {
-        return new SimpleDateFormat("yyyy/MM/dd").format(calendar.getTime());
+        return new SimpleDateFormat("yyyy/MM/dd").format(date);
     }
 
     public void setCalendar(GregorianCalendar calendar) {
-        this.calendar = calendar;
+        this.date = calendar.getTime();
     }
 }
