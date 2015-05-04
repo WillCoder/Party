@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Party</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_clear">清空</string>
+    <string name="total">总资产</string>
+    <string name="party_name">舒航程沫希乐基金会</string>
+    <string name="surplus">剩余</string>
+    <string name="add_donation_dialog_title">新的入账</string>
+    <string name="add_donation_dialog_name">姓名</string>
+    <string name="add_donation_dialog_value">金额</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_cost_dialog_location">地点</string>
+    <string name="add_cost_dialog_title">新的花费</string>
+</resources>

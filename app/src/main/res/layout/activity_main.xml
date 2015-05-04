@@ -1,0 +1,94 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_color"
+    tools:context=".MainActivity"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical">
+
+        <ListView
+            style="@style/ListViewStyle"
+            android:layout_weight="1"
+            android:id="@+id/donation_list" />
+
+
+        <LinearLayout
+            style="@style/SectionPadding"
+            android:layout_weight="0"
+            android:id="@+id/donation_section"
+            android:orientation="horizontal">
+
+            <ImageButton
+                style="@style/AddButtonStyle"
+                android:background="#0099cc"
+                android:id="@+id/add_donation_button" />
+
+            <TextView
+                style="@style/TotalText.Name"
+                android:id="@+id/total_title"
+                android:text="@string/total"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TotalText.Value"
+                android:id="@+id/total_value"
+                tools:text="128 Yuan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:animateLayoutChanges="true"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <ListView
+            style="@style/ListViewStyle"
+            android:layout_weight="1"
+            android:id="@+id/cost_list" />
+
+
+        <LinearLayout
+            style="@style/SectionPadding"
+            android:layout_weight="0"
+            android:id="@+id/balance_section"
+            android:orientation="horizontal">
+
+
+            <ImageButton
+                style="@style/AddButtonStyle"
+                android:background="#ff8a00"
+                android:id="@+id/add_cost_button" />
+
+            <TextView
+                style="@style/TotalText.Name"
+                android:id="@+id/balance_title"
+                android:text="@string/surplus"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                style="@style/TotalText.Value"
+                android:id="@+id/balance_value"
+                tools:text="128 Yuan"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

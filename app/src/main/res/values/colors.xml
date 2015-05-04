@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gray_color">@android:color/darker_gray</color>
+    <color name="blue">#0099CC</color>
+    <color name="green">#288559</color>
+</resources>
