@@ -123,7 +123,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @OnClick(R.id.add_donation_button)
-    public void onAddDonationButtonClick(ImageView addDonationButton) {
+    public void onAddDonationButtonClick(View addDonationButton) {
 
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(R.string.add_donation_dialog_title);
@@ -173,7 +173,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     @OnClick(R.id.add_cost_button)
-    public void onAddCostButtonClick(ImageView addCostButton) {
+    public void onAddCostButtonClick(View addCostButton) {
 
         final AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle(R.string.add_cost_dialog_title);
