@@ -4,13 +4,12 @@
     package="com.dora.party">
 
     <application
+        android:name="com.orm.SugarApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme"
-        android:name="com.orm.SugarApp"
         tools:replace="android:icon">
-
         <meta-data
             android:name="DATABASE"
             android:value="party_data.db" />
@@ -24,7 +23,13 @@
             android:name="DOMAIN_PACKAGE_NAME"
             android:value="com.dora.party.domain" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity" />
+
+        <activity
+            android:name=".SplashActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/app_name"
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

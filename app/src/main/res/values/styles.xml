@@ -2,6 +2,22 @@
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="actionBarStyle">@style/PartyActionBarStyle</item>
+
+        <item name="android:windowContentTransitions" tools:ignore="NewApi">true</item>
+        <item name="android:windowEnterTransition" tools:ignore="NewApi">
+            @android:transition/explode
+        </item>
+        <item name="android:windowExitTransition" tools:ignore="NewApi">
+            @android:transition/explode
+        </item>
+    </style>
+
+    <style name="SplashTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/PartyActionBarStyle</item>
+        <item name="android:windowTranslucentStatus" tools:ignore="NewApi">false</item>
+        <item name="android:statusBarColor" tools:ignore="NewApi">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:ignore="NewApi">@android:color/transparent
+        </item>
     </style>
 
     <style name="PartyActionBarStyle" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">

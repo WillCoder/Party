@@ -16,4 +16,9 @@
     <string name="unit">¥</string>
     <string name="new_cost">+开销</string>
     <string name="add_donation">+资产</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="splash_info">Let\'s party</string>
 </resources>
