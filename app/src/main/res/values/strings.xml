@@ -21,4 +21,5 @@
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="splash_info">Let\'s party</string>
+    <string name="sync_failed">网络好像出问题了</string>
 </resources>

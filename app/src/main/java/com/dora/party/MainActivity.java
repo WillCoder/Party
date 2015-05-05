@@ -13,11 +13,12 @@ import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.CalendarView;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.avos.avoscloud.AVException;
 import com.dora.party.dao.DataManager;
 import com.dora.party.domain.Cost;
 import com.dora.party.domain.Donation;
@@ -34,7 +35,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements DataManager.SyncCallBack {
 
     static final private String TAG = "MainActivity";
 
@@ -67,6 +68,7 @@ public class MainActivity extends ActionBarActivity {
         setTitle(R.string.party_name);
 
         dataManager = DataManager.getInstance(this);
+        dataManager.setSyncCallBack(this);
 
         ButterKnife.inject(this);
 
@@ -262,5 +264,18 @@ public class MainActivity extends ActionBarActivity {
             addCost(cost);
         }
         costList.setAdapter(new SimpleAdapter(this, costData, R.layout.cost_item, new String[]{"date", "name", "value"}, new int[]{R.id.date, R.id.name, R.id.value}));
+    }
+
+    @Override
+    public void success() {
+
+        refreshListViews();
+        refreshTotalValues();
+    }
+
+    @Override
+    public void failed(AVException e) {
+
+        Toast.makeText(this,getString(R.string.sync_failed),Toast.LENGTH_SHORT).show();
     }
 }

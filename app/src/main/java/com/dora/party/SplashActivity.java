@@ -7,20 +7,13 @@ import android.view.View;
 
 import com.avos.avoscloud.AVOSCloud;
 import com.dora.party.dao.DataManager;
-import com.dora.party.util.SystemUiHider;
 
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- *
- * @see SystemUiHider
- */
 public class SplashActivity extends Activity {
 
     private static final String TAG = "SplashActivity";
 
-    private static final int SPLASH_TIME = 1000;
+    private static final int SPLASH_TIME = 3000;
 
     private Thread splashTread;
 
@@ -49,8 +42,7 @@ public class SplashActivity extends Activity {
                 } catch (InterruptedException e) {
 
                 } finally {
-                    finish();
-                    startActivity(new Intent(SplashActivity.this, MainActivity.class));
+                    startNext();
                 }
             }
         };
@@ -62,7 +54,11 @@ public class SplashActivity extends Activity {
 
     public void requestData() {
 
-        DataManager.getInstance(this).syncDataFromServer();
+        DataManager.getInstance(this).syncData();
     }
 
+    private void startNext() {
+        finish();
+        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+    }
 }

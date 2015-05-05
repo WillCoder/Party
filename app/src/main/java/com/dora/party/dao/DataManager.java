@@ -44,6 +44,8 @@ public class DataManager {
 
     private Context context;
 
+    private SyncCallBack syncCallBack;
+
     public DataManager(Context context) {
         this.context = context;
     }
@@ -70,15 +72,17 @@ public class DataManager {
     public void saveDonation(Donation donation) {
 
         donation.save();
-        syncDataToServer();
+
         updateModifyTimeStamp();
+        syncData();
     }
 
     public void saveCost(Cost cost) {
 
         cost.save();
-        syncDataToServer();
+
         updateModifyTimeStamp();
+        syncData();
     }
 
     public double getAllDonationValue() {
@@ -104,8 +108,9 @@ public class DataManager {
 
         SugarRecord.deleteAll(Donation.class);
         SugarRecord.deleteAll(Cost.class);
-        syncDataToServer();
+
         updateModifyTimeStamp();
+        syncData();
     }
 
     private void updateModifyTimeStamp() {
@@ -124,44 +129,7 @@ public class DataManager {
         return sp.getLong(TIME_STAMP, 0);
     }
 
-    public void syncDataToServer() {
-
-        AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
-        try {
-
-            final String databaseName = readMetaDataFromApplication("DATABASE");
-            final File database = context.getDatabasePath(databaseName);
-            final AVFile file = AVFile.withAbsoluteLocalPath(databaseName, database.getPath());
-
-            query.getInBackground(token_id, new GetCallback<AVObject>() {
-
-                @Override
-                public void done(AVObject avObject, AVException e) {
-
-                    if (e == null) {
-
-                        avObject.put(DATA_KEY, file);
-                        avObject.put(TIME_STAMP, getModifyTimeStamp());
-                        avObject.saveInBackground(new SaveCallback() {
-                            @Override
-                            public void done(AVException e) {
-                                if (e == null) {
-                                    Log.i(TAG, "Save successfully.");
-                                } else {
-                                    Log.e(TAG, "Save failed.");
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void syncDataFromServer() {
+    public void syncData() {
 
         AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
         query.findInBackground(
@@ -181,33 +149,86 @@ public class DataManager {
 
     private void overrideFromServer() {
 
-        final String databaseName = readMetaDataFromApplication("DATABASE");
-        final File databaseFile = context.getDatabasePath(databaseName);
+        try {
+            final String databaseName = readMetaDataFromApplication("DATABASE");
+            final File databaseFile = context.getDatabasePath(databaseName);
+            final AVFile file = AVFile.withAbsoluteLocalPath(databaseName, databaseFile.getPath());
 
-        AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
-        query.getInBackground(token_id, new GetCallback<AVObject>() {
+            AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
+            query.getInBackground(token_id, new GetCallback<AVObject>() {
 
-            @Override
-            public void done(AVObject avObject, AVException e) {
+                @Override
+                public void done(AVObject avObject, AVException e) {
 
-                long remoteTimestamp = avObject.getLong(TIME_STAMP);
-                long localTimestamp = getModifyTimeStamp();
+                    if (e == null) {
 
-                if (remoteTimestamp > localTimestamp) {
+                        long remoteTimestamp = avObject.getLong(TIME_STAMP);
+                        long localTimestamp = getModifyTimeStamp();
 
-                    AVFile avFile = avObject.getAVFile(DATA_KEY);
-                    avFile.getDataInBackground(new GetDataCallback() {
-                        public void done(byte[] data, AVException e) {
+                        if (remoteTimestamp < localTimestamp) {
 
-                            if (!databaseFile.getParentFile().exists()) {
-                                databaseFile.getParentFile().mkdir();
-                            }
-                            saveBytesToFile(data, databaseFile);
+                            avObject.put(DATA_KEY, file);
+                            avObject.put(TIME_STAMP, getModifyTimeStamp());
+                            avObject.saveInBackground(new SaveCallback() {
+                                @Override
+                                public void done(AVException e) {
+                                    if (e == null) {
+                                        Log.i(TAG, "Save successfully.");
+
+                                        if (syncCallBack != null) {
+                                            syncCallBack.success();
+                                        }
+                                    } else {
+                                        Log.e(TAG, "Save failed.");
+
+                                        if (syncCallBack != null) {
+                                            syncCallBack.failed(e);
+                                        }
+                                    }
+                                }
+                            });
+                        } else {
+                            AVFile avFile = avObject.getAVFile(DATA_KEY);
+                            avFile.getDataInBackground(new GetDataCallback() {
+                                public void done(byte[] data, AVException e) {
+
+                                    if (e == null) {
+                                        if (!databaseFile.getParentFile().exists()) {
+                                            databaseFile.getParentFile().mkdir();
+                                        }
+                                        saveBytesToFile(data, databaseFile);
+
+                                        if (syncCallBack != null) {
+                                            syncCallBack.success();
+                                        }
+                                    } else {
+                                        Log.d(TAG, e.getMessage());
+
+                                        if (syncCallBack != null) {
+                                            syncCallBack.failed(e);
+                                        }
+                                    }
+                                }
+                            });
                         }
-                    });
+                    }
                 }
-            }
-        });
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void setSyncCallBack(SyncCallBack syncCallBack) {
+
+        this.syncCallBack = syncCallBack;
+    }
+
+    public interface SyncCallBack {
+
+        void success();
+
+        void failed(AVException e);
     }
 
     private String readMetaDataFromApplication(String key) {
