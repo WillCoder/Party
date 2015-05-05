@@ -3,18 +3,11 @@ package com.dora.party;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
 import android.view.View;
 
+import com.avos.avoscloud.AVOSCloud;
+import com.dora.party.dao.DataManager;
 import com.dora.party.util.SystemUiHider;
-import com.qiniu.android.http.ResponseInfo;
-import com.qiniu.android.storage.UpCompletionHandler;
-import com.qiniu.android.storage.UploadManager;
-
-import org.json.JSONObject;
-
-import java.io.File;
 
 
 /**
@@ -31,6 +24,10 @@ public class SplashActivity extends Activity {
 
     private Thread splashTread;
 
+    private String AppId = "mas23lvpoxhe5ixk3ec1y74w1qhqtkfod8yja77kwefd3f5q";
+
+    private String AppKey = "3zvdmol6o2ymhxi89l2s57yovo81lblb2so0eaopnuubfce9";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -39,6 +36,7 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
+        AVOSCloud.initialize(this, AppId, AppKey);
 
         splashTread = new Thread() {
             @Override
@@ -64,18 +62,31 @@ public class SplashActivity extends Activity {
     public void requestData() {
 
 
-        File file = new File(Environment.getExternalStorageDirectory(), "1416824357183.test");
-        Log.d(TAG, "File path --> " + file.getPath());
-        String key = "123";
-        String token = "VCgCBGYPx-5RrmkdC85i0NhNI44q8YorXovulTZ3";
-        UploadManager uploadManager = new UploadManager();
-        uploadManager.put(file, key, token,
-                new UpCompletionHandler() {
-                    @Override
-                    public void complete(String key, ResponseInfo info, JSONObject response) {
-                        Log.d(TAG, "complete ->>" + String.valueOf(info));
-                    }
-                }, null);
+//        File file = new File(Environment.getExternalStorageDirectory(), "1416824357183.test");
+//        Log.d(TAG, "File path --> " + file.getPath());
+//        String key = "123";
+//        String token = "VCgCBGYPx-5RrmkdC85i0NhNI44q8YorXovulTZ3";
+//        UploadManager uploadManager = new UploadManager();
+//        uploadManager.put(file, key, token,
+//                new UpCompletionHandler() {
+//                    @Override
+//                    public void complete(String key, ResponseInfo info, JSONObject response) {
+//                        Log.d(TAG, "complete ->>" + String.valueOf(info));
+//                    }
+//                }, null);
+
+//        DataManager.getInstance(this).initServer();
+        DataManager.getInstance(this).syncDataFromServer();
+
+//        AVObject gameScore = new AVObject("GameScore");
+//        gameScore.put("score", 1200);
+//        gameScore.put("playerName", "steve");
+//        gameScore.put("level", 10);
+//        try {
+//            gameScore.save();
+//        } catch (AVException e) {
+//            Log.d(TAG, e.getMessage());
+//        }
     }
 
 }
