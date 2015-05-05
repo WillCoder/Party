@@ -1,7 +1,9 @@
 package com.dora.party.dao;
 
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteException;
@@ -11,7 +13,9 @@ import com.avos.avoscloud.AVException;
 import com.avos.avoscloud.AVFile;
 import com.avos.avoscloud.AVObject;
 import com.avos.avoscloud.AVQuery;
+import com.avos.avoscloud.FindCallback;
 import com.avos.avoscloud.GetCallback;
+import com.avos.avoscloud.GetDataCallback;
 import com.avos.avoscloud.SaveCallback;
 import com.dora.party.domain.Cost;
 import com.dora.party.domain.Donation;
@@ -19,7 +23,6 @@ import com.orm.SugarRecord;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,13 +32,15 @@ public class DataManager {
 
     private final static String TAG = "DataManager";
 
-    private final static String TOKEN_ID = "55488d4de4b03fd834536ecf";
-
     private final static String TOKEN_NAME = "PartyToken";
 
     private final static String DATA_KEY = "database";
 
+    private final static String TIME_STAMP = "timestamp";
+
     private static DataManager dataManager;
+
+    private String token_id = null;
 
     private Context context;
 
@@ -66,12 +71,14 @@ public class DataManager {
 
         donation.save();
         syncDataToServer();
+        updateModifyTimeStamp();
     }
 
     public void saveCost(Cost cost) {
 
         cost.save();
         syncDataToServer();
+        updateModifyTimeStamp();
     }
 
     public double getAllDonationValue() {
@@ -97,6 +104,24 @@ public class DataManager {
 
         SugarRecord.deleteAll(Donation.class);
         SugarRecord.deleteAll(Cost.class);
+        syncDataToServer();
+        updateModifyTimeStamp();
+    }
+
+    private void updateModifyTimeStamp() {
+
+        SharedPreferences sp = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.putLong(TIME_STAMP, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    private long getModifyTimeStamp() {
+
+        SharedPreferences sp = context.getSharedPreferences(context.getPackageName(), Activity.MODE_PRIVATE);
+
+        return sp.getLong(TIME_STAMP, 0);
     }
 
     public void syncDataToServer() {
@@ -108,7 +133,7 @@ public class DataManager {
             final File database = context.getDatabasePath(databaseName);
             final AVFile file = AVFile.withAbsoluteLocalPath(databaseName, database.getPath());
 
-            query.getInBackground(TOKEN_ID, new GetCallback<AVObject>() {
+            query.getInBackground(token_id, new GetCallback<AVObject>() {
 
                 @Override
                 public void done(AVObject avObject, AVException e) {
@@ -116,13 +141,14 @@ public class DataManager {
                     if (e == null) {
 
                         avObject.put(DATA_KEY, file);
+                        avObject.put(TIME_STAMP, getModifyTimeStamp());
                         avObject.saveInBackground(new SaveCallback() {
                             @Override
                             public void done(AVException e) {
                                 if (e == null) {
-                                    Log.i("LeanCloud", "Save successfully.");
+                                    Log.i(TAG, "Save successfully.");
                                 } else {
-                                    Log.e("LeanCloud", "Save failed.");
+                                    Log.e(TAG, "Save failed.");
                                 }
                             }
                         });
@@ -130,42 +156,58 @@ public class DataManager {
                 }
             });
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void initServer() {
-
-        AVObject tokenObj = new AVObject(TOKEN_NAME);
-        tokenObj.saveInBackground();
-    }
-
     public void syncDataFromServer() {
 
+        AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
+        query.findInBackground(
+                new FindCallback<AVObject>() {
+                    public void done(List<AVObject> avObjects, AVException e) {
+                        if (e == null) {
+                            token_id = avObjects.get(0).getObjectId();
+                            overrideFromServer();
+                        } else {
+                            Log.d(TAG, "Error ->> " + e.getMessage());
+                        }
+                    }
+                }
+
+        );
+    }
+
+    private void overrideFromServer() {
+
         final String databaseName = readMetaDataFromApplication("DATABASE");
-        final File database = context.getDatabasePath(databaseName);
+        final File databaseFile = context.getDatabasePath(databaseName);
 
         AVQuery<AVObject> query = new AVQuery<>(TOKEN_NAME);
-        try {
-            AVFile avFile = (AVFile) query.get(TOKEN_ID).get(DATA_KEY);
+        query.getInBackground(token_id, new GetCallback<AVObject>() {
 
-            if (avFile != null) {
-                try {
-                    if (database.exists()) {
-                        database.delete();
-                    }
-                    saveBytesToFile(avFile.getData(), database);
-                } catch (AVException e1) {
-                    e1.printStackTrace();
+            @Override
+            public void done(AVObject avObject, AVException e) {
+
+                long remoteTimestamp = avObject.getLong(TIME_STAMP);
+                long localTimestamp = getModifyTimeStamp();
+
+                if (remoteTimestamp > localTimestamp) {
+
+                    AVFile avFile = avObject.getAVFile(DATA_KEY);
+                    avFile.getDataInBackground(new GetDataCallback() {
+                        public void done(byte[] data, AVException e) {
+
+                            if (!databaseFile.getParentFile().exists()) {
+                                databaseFile.getParentFile().mkdir();
+                            }
+                            saveBytesToFile(data, databaseFile);
+                        }
+                    });
                 }
             }
-
-        } catch (AVException e) {
-            e.printStackTrace();
-        }
+        });
     }
 
     private String readMetaDataFromApplication(String key) {
@@ -181,10 +223,10 @@ public class DataManager {
         return null;
     }
 
-    static private void saveBytesToFile(byte[] fileBytes, File yourFile) {
+    static private void saveBytesToFile(byte[] fileBytes, File file) {
 
         try {
-            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(yourFile));
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
             bos.write(fileBytes);
             bos.flush();
             bos.close();

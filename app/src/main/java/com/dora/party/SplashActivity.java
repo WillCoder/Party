@@ -44,7 +44,6 @@ public class SplashActivity extends Activity {
                 try {
                     synchronized (this) {
                         wait(SPLASH_TIME);
-                        requestData();
                     }
 
                 } catch (InterruptedException e) {
@@ -57,36 +56,13 @@ public class SplashActivity extends Activity {
         };
 
         splashTread.start();
+
+        requestData();
     }
 
     public void requestData() {
 
-
-//        File file = new File(Environment.getExternalStorageDirectory(), "1416824357183.test");
-//        Log.d(TAG, "File path --> " + file.getPath());
-//        String key = "123";
-//        String token = "VCgCBGYPx-5RrmkdC85i0NhNI44q8YorXovulTZ3";
-//        UploadManager uploadManager = new UploadManager();
-//        uploadManager.put(file, key, token,
-//                new UpCompletionHandler() {
-//                    @Override
-//                    public void complete(String key, ResponseInfo info, JSONObject response) {
-//                        Log.d(TAG, "complete ->>" + String.valueOf(info));
-//                    }
-//                }, null);
-
-//        DataManager.getInstance(this).initServer();
         DataManager.getInstance(this).syncDataFromServer();
-
-//        AVObject gameScore = new AVObject("GameScore");
-//        gameScore.put("score", 1200);
-//        gameScore.put("playerName", "steve");
-//        gameScore.put("level", 10);
-//        try {
-//            gameScore.save();
-//        } catch (AVException e) {
-//            Log.d(TAG, e.getMessage());
-//        }
     }
 
 }
